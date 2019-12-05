@@ -13,27 +13,26 @@ Working prototype.
 Implementation :
 Saga is a sequence of local transactions where each local transaction performs the task
 assigned to it and triggers the next transaction. There are two types of architectures in Saga pattern namely Choreography based pattern and Orchestration based pattern. We chose Orchestration based pattern due to following reasons:
-1. It maintains data consistency across multiple services without distributed transactions
-2. It helps avoid cyclic dependency when multiple external services are used
-3. Highly decoupled architecture
+  1. It maintains data consistency across multiple services without distributed transactions
+  2. It helps avoid cyclic dependency when multiple external services are used
+  3. Highly decoupled architecture
 The only drawback is the possibility of Orchestrating Saga becoming complex and directing dumb logic in other Sagas.
+
+
 There are 6 Sagas in the design which are as follows:
-1. User registration
-2. Control
-3. Flight Booking
-4. Hotel Booking
-5. Car Booking
-6. End
-User Registration Saga :
-It provides facility for the User to register and Login before starting any kind of bookings.
-Control Saga:
-It is the critical logic in this Orchestration based architecture. It commands the other Sagas and maintains Idempotency, Consistency and also triggers the compensating transactions in case of any failure.
-4
+  1. User registration
+  2. Control
+  3. Flight Booking
+  4. Hotel Booking
+  5. Car Booking
+  6. End
+User Registration Saga : It provides facility for the User to register and Login before starting any kind of bookings.
+
+Control Saga: It is the critical logic in this Orchestration based architecture. It commands the other Sagas and maintains Idempotency, Consistency and also triggers the compensating transactions in case of any failure. 
 Event Sourcing is used to maintain the state and provide a log of the changes made in the states.
 There is an internal database which stores multiple locks and booking status attributes to maintain the state of the booking and assure Idempotency. The updates to this internal database and commands to the Sagas are atomic to maintain consistency.
-Flight Booking Saga, Hotel Booking Saga and Car booking:
-They work according to the directions of the Control Saga and books the corresponding
-entities by communicating with the External Booking Service and Payment Gateway and send the Booking status to the Control Saga. They also execute the cancellation compensating transactions whenever the Control Saga directs.
-End Saga:
-It updates the OLTP database after successful completion of the Trip Booking. It is the final Saga and cannot fail.
+
+Flight Booking Saga, Hotel Booking Saga and Car booking: They work according to the directions of the Control Saga and books the corresponding entities by communicating with the External Booking Service and Payment Gateway and send the Booking status to the Control Saga. They also execute the cancellation compensating transactions whenever the Control Saga directs.
+
+End Saga: It updates the OLTP database after successful completion of the Trip Booking. It is the final Saga and cannot fail.
 If any changes are made to Flight booking Saga, Hotel Booking Saga or Car Booking Saga, it will be communicated only to Control Saga which makes this architecture highly decoupled and eliminates cyclic dependencies amongst the various Booking Sagas.
